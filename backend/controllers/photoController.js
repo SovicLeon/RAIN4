@@ -1,5 +1,6 @@
 var PhotoModel = require('../models/photoModel.js');
 var LikeModel = require('../models/likeModel.js');  // Import the LikeModel at the top
+var CommentModel = require('../models/commentModel.js');
 
 /**
  * photoController.js
@@ -14,6 +15,7 @@ module.exports = {
     list: function (req, res) {
         PhotoModel.find()
             .populate('postedBy')
+            .sort({ date: -1 })
             .exec(function (err, photos) {
                 if (err) {
                     return res.status(500).json({
@@ -78,7 +80,7 @@ module.exports = {
                 const userId = req.session.userId;
 
                 // Check if the user has liked the photo
-                
+
                 LikeModel.findOne({ postedBy: userId, liked: photo._id }, (err, like) => {
                     if (err) {
                         return res.status(500).json({
@@ -89,10 +91,22 @@ module.exports = {
 
                     // If a like exists, the user has liked the photo
                     const userHasLiked = Boolean(like);
-                    // Add this info to the photo object
-                    const photoWithLikeInfo = { ...photo._doc, userHasLiked };
 
-                    return res.json(photoWithLikeInfo);
+                    CommentModel.find({ replyTo: id })
+                        .populate('postedBy')
+                        .sort({ date: -1 })
+                        .exec(function (err, comments) {
+                            if (err) {
+                                return res.status(500).json({
+                                    message: 'Error when getting comments.',
+                                    error: err
+                                });
+                            }
+                            // Add this info to the photo object
+                            const photoWithLikeInfo = { ...photo._doc, userHasLiked, comments };
+
+                            return res.json(photoWithLikeInfo);
+                        });
                 });
             });
     },
@@ -107,7 +121,8 @@ module.exports = {
             path: "/images/" + req.file.filename,
             postedBy: req.session.userId,
             views: 0,
-            likes: 0
+            likes: 0,
+            date : new Date()
         });
 
         photo.save(function (err, photo) {

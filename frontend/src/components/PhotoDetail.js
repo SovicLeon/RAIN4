@@ -9,7 +9,7 @@ function PhotoDetail() {
   const [likesCount, setLikesCount] = useState(0);
   const userContext = useContext(UserContext);
   const [description, setDescription] = useState('');
-  const [uploaded, setCommented] = useState(false);
+
   const { photoId } = useParams();
 
   useEffect(() => {
@@ -34,16 +34,35 @@ function PhotoDetail() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('description', description);
     const res = await fetch(`http://localhost:3001/photos/${photoId}/comment`, {
       method: 'POST',
       credentials: 'include',
-      body: formData
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ description, photoId })
     });
     const data = await res.json();
 
-    setCommented(true);
+    if (res.ok) {
+      setPhoto((prevPhoto) => {
+        const prevComments = Array.isArray(prevPhoto.comments) ? prevPhoto.comments : [];
+        const newComment = {
+          ...data,
+          postedBy: {
+            username: userContext.user.username,  // assuming you have username in userContext.user
+          },
+        };
+        return {
+          ...prevPhoto,
+          comments: [newComment, ...prevComments]
+        }        
+      });
+      setDescription(''); // Clear the description after successfully posting
+    } else {
+      // Handle error here
+      console.log(data);
+    }
   }
 
   const handleLike = () => {
@@ -72,6 +91,9 @@ function PhotoDetail() {
     return null; // Add a loading spinner or some placeholder here
   }
 
+  let date = new Date(photo.date);
+  let formattedDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+
   return (
     <div className="card bg-dark text-white mb-2">
       <img
@@ -82,27 +104,35 @@ function PhotoDetail() {
         height="400"
       />
       <div className="card-img-title">
-        <h5 className="card-title">{photo.name}</h5>
-          {userContext.user ?
-            <>
-              <button
-                className={`btn btn-${liked ? 'primary' : 'outline-primary'}`}
-                onClick={handleLike}
-              >
-                {liked ? 'Liked' : 'Like'}
-              </button>
-              <form className="form-group" onSubmit={onSubmit}>
-                {!userContext.user ? <Navigate replace to="/login" /> : ""}
-                {uploaded ? <Navigate replace to="/photos" /> : ""}
-                <label>Komentar: </label>
-                <input type="text" className="form-control" name="description" placeholder="Komentar" value={description} onChange={(e) => { setDescription(e.target.value) }} />
-                <input className="btn btn-primary" type="submit" name="submit" value="Komentiraj" />
-              </form>
-            </>
-            :
-            <></>
-          }
+        <h5 className="card-title">Objavil: {photo.name}</h5>
+        <h6 className="card-title">{formattedDate}</h6>
         <span className="ms-2">{likesCount} {likesCount === 1 ? 'like' : 'likes'}</span>
+        {userContext.user ?
+          <>
+            <button
+              className={`btn btn-${liked ? 'primary' : 'outline-primary'}`}
+              onClick={handleLike}
+            >
+              {liked ? 'Liked' : 'Like'}
+            </button>
+            <form className="form-group" onSubmit={onSubmit}>
+              {!userContext.user ? <Navigate replace to="/login" /> : ""}
+              <label>Komentar: </label>
+              <input type="text" className="form-control" name="description" placeholder="Komentar" value={description} onChange={(e) => { setDescription(e.target.value) }} />
+              <input className="btn btn-primary" type="submit" name="submit" value="Komentiraj" />
+            </form>
+          </>
+          :
+          <></>
+        }
+      </div>
+
+      <div className="card-body">
+        {photo.comments.map((comment, index) => (
+          <div key={index}>
+            <strong>{comment.postedBy.username}:</strong> {comment.description}
+          </div>
+        ))}
       </div>
     </div>
   );

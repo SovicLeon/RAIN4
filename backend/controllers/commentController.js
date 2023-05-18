@@ -31,7 +31,7 @@ module.exports = {
     create: function (req, res) {
         var comment = new CommentModel({
             description : req.body.description,
-            replyTo : req.body.question,
+            replyTo : req.body.photoId,
             postedBy : req.session.userId,
             date : new Date()
         });

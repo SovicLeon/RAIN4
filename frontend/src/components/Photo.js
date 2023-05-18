@@ -36,6 +36,9 @@ function Photo(props) {
     }
   };
 
+  let date = new Date(props.photo.date);
+  let formattedDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+
   return (
     <div className="card bg-dark text-white mb-2">
       <img
@@ -47,7 +50,8 @@ function Photo(props) {
         onClick={handleImageClick}
       />
       <div className="card-img-title">
-        <h5 className="card-title">{props.photo.name}</h5>
+        <h5 className="card-title">Objavil: {props.photo.name}</h5>
+        <h6 className="card-title">{formattedDate}</h6>
         <UserContext.Consumer>
           {context => (
             context.user ?
