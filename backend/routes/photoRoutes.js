@@ -6,6 +6,7 @@ var upload = multer({dest: 'public/images/'});
 var router = express.Router();
 var photoController = require('../controllers/photoController.js');
 var likeController = require('../controllers/likeController.js');
+var commentController = require('../controllers/commentController.js');
 
 function requiresLogin(req, res, next){
     if(req.session && req.session.userId){
@@ -20,6 +21,8 @@ function requiresLogin(req, res, next){
 router.get('/', photoController.list);
 //router.get('/publish', requiresLogin, photoController.publish);
 router.get('/:id', photoController.show);
+
+router.post('/:photoId/comment', requiresLogin, commentController.create);
 
 router.post('/', requiresLogin, upload.single('image'), photoController.create);
 

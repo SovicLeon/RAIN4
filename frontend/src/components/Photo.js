@@ -1,10 +1,18 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { UserContext } from "../userContext";
+import { useNavigate } from 'react-router-dom';
 
 function Photo(props) {
   const [liked, setLiked] = useState(props.photo.userHasLiked);
   const [likesCount, setLikesCount] = useState(props.photo.likes);
+
+  const navigate = useNavigate();
+
+  // Add this function inside the Photo component
+  const handleImageClick = () => {
+    navigate(`/photos/${props.photo._id}`);
+  };
 
   const handleLike = () => {
     if (liked) {
@@ -36,25 +44,25 @@ function Photo(props) {
         alt={props.photo.name}
         width="50"
         height="400"
+        onClick={handleImageClick}
       />
       <div className="card-img-title">
         <h5 className="card-title">{props.photo.name}</h5>
         <UserContext.Consumer>
-                        {context => (
-                            context.user ?
-                                <>
-        <button
-          className={`btn btn-${liked ? 'primary' : 'outline-primary'}`}
-          onClick={handleLike}
-        >
-          {liked ? 'Liked' : 'Like'}
-        </button>
-                                </>
-                            :
-                                <></>
-
-                        )}
-          </UserContext.Consumer>
+          {context => (
+            context.user ?
+              <>
+                <button
+                  className={`btn btn-${liked ? 'primary' : 'outline-primary'}`}
+                  onClick={handleLike}
+                >
+                  {liked ? 'Liked' : 'Like'}
+                </button>
+              </>
+              :
+              <></>
+          )}
+        </UserContext.Consumer>
         <span className="ms-2">{likesCount} {likesCount === 1 ? 'like' : 'likes'}</span>
       </div>
     </div>
