@@ -1,6 +1,7 @@
 var PhotoModel = require('../models/photoModel.js');
 var LikeModel = require('../models/likeModel.js');  // Import the LikeModel at the top
 var CommentModel = require('../models/commentModel.js');
+var ReportModel = require('../models/reportModel.js');
 
 /**
  * photoController.js
@@ -23,11 +24,11 @@ module.exports = {
                         error: err
                     });
                 }
-
+    
                 // Use the logged-in user's ID from the session
                 const userId = req.session.userId;
-
-                // For each photo, check if the user has liked it
+    
+                // For each photo, check if the user has liked it and get the number of reports
                 const photoPromises = photos.map(photo => {
                     return new Promise((resolve, reject) => {
                         LikeModel.findOne({ postedBy: userId, liked: photo._id }, (err, like) => {
@@ -36,17 +37,22 @@ module.exports = {
                             } else {
                                 // If a like exists, the user has liked the photo
                                 const userHasLiked = Boolean(like);
-                                console.log(photo._id);
-                                console.log(userId);
-                                // Add this info to the photo object
-                                const photoWithLikeInfo = { ...photo._doc, userHasLiked };
-                                resolve(photoWithLikeInfo);
+                                
+                                // Get the number of reports for this photo
+                                ReportModel.countDocuments({ reported: photo._id }, (err, reportCount) => {
+                                    if (err) {
+                                        reject(err);
+                                    } else {
+                                        // Add this info to the photo object
+                                        const photoWithLikeInfo = { ...photo._doc, userHasLiked, reportCount };
+                                        resolve(photoWithLikeInfo);
+                                    }
+                                });
                             }
                         });
                     });
                 });
-
-
+    
                 // Wait for all promises to finish
                 Promise.all(photoPromises)
                     .then(photosWithLikeInfo => res.json(photosWithLikeInfo))

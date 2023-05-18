@@ -113,29 +113,39 @@ function PhotoDetail() {
         <h5 className="card-title">Naslov: {photo.name}</h5>
         <h5 className="card-title">Objavil: {photo.postedBy.username}</h5>
         <h6 className="card-title">{formattedDate}</h6>
-        <span className="ms-2">{likesCount} {likesCount === 1 ? 'like' : 'likes'}</span>
-        {userContext.user ?
-          <>
-            <button
-              className={`btn btn-danger`}
-              onClick={handleReport}
-            >Report</button>
-            <button
-              className={`btn btn-${liked ? 'primary' : 'outline-primary'}`}
-              onClick={handleLike}
-            >
-              {liked ? 'Liked' : 'Like'}
-            </button>
-            <form className="form-group" onSubmit={onSubmit}>
-              {!userContext.user ? <Navigate replace to="/login" /> : ""}
-              <label>Komentar: </label>
-              <input type="text" className="form-control" name="description" placeholder="Komentar" value={description} onChange={(e) => { setDescription(e.target.value) }} />
-              <input className="btn btn-primary" type="submit" name="submit" value="Komentiraj" />
-            </form>
-          </>
-          :
-          <></>
-        }
+        <div className="d-flex align-items-center mb-2">
+          <span className="me-2">{likesCount} {likesCount === 1 ? 'like' : 'likes'}</span>
+          {userContext.user &&
+            <>
+              <button
+                className="btn btn-danger me-2"
+                onClick={handleReport}
+              >Report</button>
+              <button
+                className={`btn btn-${liked ? 'primary' : 'outline-primary'}`}
+                onClick={handleLike}
+              >
+                {liked ? 'Liked' : 'Like'}
+              </button>
+            </>
+          }
+        </div>
+        <form className="form-group" onSubmit={onSubmit}>
+          {!userContext.user ? <Navigate replace to="/login" /> : ""}
+          <div className="mb-3">
+            <label htmlFor="description" className="form-label">Komentar:</label>
+            <input
+              type="text"
+              className="form-control"
+              id="description"
+              name="description"
+              placeholder="Vnesite komentar"
+              value={description}
+              onChange={(e) => { setDescription(e.target.value) }}
+            />
+          </div>
+          <button type="submit" className="btn btn-primary">Komentiraj</button>
+        </form>
       </div>
 
       <div className="card-body">

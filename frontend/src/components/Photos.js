@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import Photo from './Photo';
 var decay = require('decay');
 
-
 function Photos() {
     const [photos, setPhotos] = useState([]);
 
@@ -10,6 +9,9 @@ function Photos() {
         const getPhotos = async function () {
             const res = await fetch("http://localhost:3001/photos", { credentials: 'include' });
             const data = await res.json();
+
+            // Filter out photos with more than 1 report
+            const filteredPhotos = data.filter(photo => photo.reportCount <= 1);
 
             // Get current time
             // Function to calculate hot score
@@ -19,7 +21,7 @@ function Photos() {
             };
 
             // Sort photos by hot score in descending order (most likes first)
-            const sortedPhotos = data.sort((a, b) => hotScore(b) - hotScore(a));
+            const sortedPhotos = filteredPhotos.sort((a, b) => hotScore(b) - hotScore(a));
 
             setPhotos(sortedPhotos);
         }
