@@ -7,6 +7,7 @@ var router = express.Router();
 var photoController = require('../controllers/photoController.js');
 var likeController = require('../controllers/likeController.js');
 var commentController = require('../controllers/commentController.js');
+var reportController = require('../controllers/reportController.js');
 
 function requiresLogin(req, res, next){
     if(req.session && req.session.userId){
@@ -23,6 +24,8 @@ router.get('/', photoController.list);
 router.get('/:id', photoController.show);
 
 router.post('/:photoId/comment', requiresLogin, commentController.create);
+
+router.post('/:photoId/report', requiresLogin, reportController.add);
 
 router.post('/', requiresLogin, upload.single('image'), photoController.create);
 

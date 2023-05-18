@@ -21,6 +21,8 @@ function Profile(){
             <h1>User profile</h1>
             <p>Username: {profile.username}</p>
             <p>Email: {profile.email}</p>
+            <p>Number of photos posted: {profile.totalPhotos}</p>
+            <p>Total number of likes on posted photos: {profile.totalLikes}</p>
         </>
     );
 }

@@ -87,6 +87,12 @@ function PhotoDetail() {
     }
   };
 
+  const handleReport = () => {
+    axios
+    .post(`http://localhost:3001/photos/${photoId}/report`, {}, { withCredentials: true })
+    .catch((error) => console.log(error));
+  };
+
   if (!photo) {
     return null; // Add a loading spinner or some placeholder here
   }
@@ -104,11 +110,16 @@ function PhotoDetail() {
         height="400"
       />
       <div className="card-img-title">
-        <h5 className="card-title">Objavil: {photo.name}</h5>
+        <h5 className="card-title">Naslov: {photo.name}</h5>
+        <h5 className="card-title">Objavil: {photo.postedBy.username}</h5>
         <h6 className="card-title">{formattedDate}</h6>
         <span className="ms-2">{likesCount} {likesCount === 1 ? 'like' : 'likes'}</span>
         {userContext.user ?
           <>
+            <button
+              className={`btn btn-danger`}
+              onClick={handleReport}
+            >Report</button>
             <button
               className={`btn btn-${liked ? 'primary' : 'outline-primary'}`}
               onClick={handleLike}

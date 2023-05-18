@@ -50,7 +50,8 @@ function Photo(props) {
         onClick={handleImageClick}
       />
       <div className="card-img-title">
-        <h5 className="card-title">Objavil: {props.photo.name}</h5>
+        <h5 className="card-title">Naslov: {props.photo.name}</h5>
+        <h5 className="card-title">Objavil: {props.photo.postedBy.username}</h5>
         <h6 className="card-title">{formattedDate}</h6>
         <UserContext.Consumer>
           {context => (

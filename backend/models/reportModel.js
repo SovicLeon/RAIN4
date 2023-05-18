@@ -1,15 +1,15 @@
 var mongoose = require('mongoose');
 var Schema   = mongoose.Schema;
 
-var likeSchema = new Schema({
+var reportSchema = new Schema({
 	'postedBy' : {
 	 	type: Schema.Types.ObjectId,
 	 	ref: 'user'
 	},
-	'liked' : {
+	'reported' : {
 		type: Schema.Types.ObjectId,
 		ref: 'photo'
    	}
 });
 
-module.exports = mongoose.model('like', likeSchema);
+module.exports = mongoose.model('report', reportSchema);
